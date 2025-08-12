@@ -4,6 +4,7 @@ const router = require("./routes/Routes");
 const URL = require("./models/url")
 const { handleLogFile } = require('./middlewares/logfile');
 const cors = require("cors");
+require('dotenv').config()
 
 const app = express();
 const PORT = 8000;
@@ -12,7 +13,7 @@ app.use(handleLogFile)
 
 app.set("view engine","ejs")
 
-connectTODB("mongodb+srv://MyDataBase:MyDataBase@mydatabase.ri6am.mongodb.net/Short-it?retryWrites=true&w=majority&appName=MyDataBase")
+connectTODB(process.env.MONGO_URL)
   .then((result) => {
     console.log("Mongodb connected sucessfully");
   })
