@@ -43,6 +43,19 @@ export default function Home() {
     window.location.href = shortUrl;
   };
 
+  const copyText = () => {
+    if (!shortUrl) return;
+
+    navigator.clipboard
+      .writeText(shortUrl)
+      .then(() => {
+        alert("Copied: " + shortUrl);
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+      });
+  };
+
   return (
     <div id="home" className="container">
       <div id="header">
@@ -66,7 +79,11 @@ export default function Home() {
             value={originalUrl}
             onChange={(e) => setOriginalUrl(e.target.value)}
           />
-          <button className="btn btn-primary" onClick={shorten} disabled={loading}>
+          <button
+            className="btn btn-primary"
+            onClick={shorten}
+            disabled={loading}
+          >
             {loading ? "Shortening..." : "Shorten URL"}
           </button>
         </div>
@@ -75,22 +92,32 @@ export default function Home() {
           URL shortener allows you to create a shortened link making it easy to
           share
         </h5>
+
         {shortUrl && (
           <div>
             <p>Shortened URL:</p>
             <div className="shortnedUrlOut">
-              <a href={shortUrl} target="_blank" rel="noopener noreferrer">
+              <p rel="noopener noreferrer" id="myLink">
                 {shortUrl}
-              </a>
+              </p>
               <br />
               <br />
               <button
                 type="button"
-                class="btn btn-success"
+                className="btn btn-success"
                 id="redirectToWebsite"
                 onClick={redirectToWebsite}
               >
                 Go to the website
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-primary ms-2"
+                id="liveToastBtn"
+                onClick={copyText}
+              >
+                Copy URL
               </button>
             </div>
           </div>
@@ -100,7 +127,7 @@ export default function Home() {
 
       <div className="row features gap-4">
         <div className="col item">
-          <h5>Instant Shortening </h5>{" "}
+          <h5>Instant Shortening </h5>
           <p>Paste your URL and get a short link instantly.</p>
         </div>
         <div className="col item">
@@ -116,29 +143,30 @@ export default function Home() {
         </div>
       </div>
       <br />
-      <section class="how-it-works text-center">
-        <div class="container">
+
+      <section className="how-it-works text-center">
+        <div className="container">
           <h2>How It Works</h2>
-          <div class="row g-4">
-            <div class="col-md-4">
-              <div class="step">
-                <div class="step-number">1</div>
+          <div className="row g-4">
+            <div className="col-md-4">
+              <div className="step">
+                <div className="step-number">1</div>
                 <h5>Paste Your Link</h5>
                 <br />
                 <p>Drop your long URL in the box.</p>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="step">
-                <div class="step-number">2</div>
+            <div className="col-md-4">
+              <div className="step">
+                <div className="step-number">2</div>
                 <h5>Click “Short-it”</h5>
                 <br />
                 <p>Watch the magic happen instantly.</p>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="step">
-                <div class="step-number">3</div>
+            <div className="col-md-4">
+              <div className="step">
+                <div className="step-number">3</div>
                 <h5>Share Anywhere</h5>
                 <p>
                   Post your neat, short link on social media, emails, or
@@ -149,7 +177,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      
+
       <section className="footer">
         <h4>Short-it — Making your links shorter, your life easier.</h4>
       </section>
