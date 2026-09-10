@@ -76,9 +76,9 @@ Start MongoDB, then run both apps:
 npm run dev
 ```
 
-- Web app: http://localhost:5173
-- API: http://localhost:8000
-- Health: http://localhost:8000/api/health
+- Web app: https://shortit-url.netlify.app
+- API: https://shortit-lluo.onrender.com
+- Health: https://shortit-lluo.onrender.com/api/health
 
 Or start them separately:
 
