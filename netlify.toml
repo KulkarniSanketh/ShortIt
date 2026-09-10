@@ -2,3 +2,6 @@
   base = "frontend"
   command = "npm install && npm run build"
   publish = "dist"
+
+[build.environment]
+  VITE_API_URL = "https://shortit-lluo.onrender.com"

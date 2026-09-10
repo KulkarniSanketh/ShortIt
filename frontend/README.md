@@ -8,4 +8,4 @@ npm install
 npm start
 ```
 
-The app expects the API at `VITE_API_URL` (default `http://localhost:8000`).
+The app expects the API at `VITE_API_URL` (default `https://shortit-lluo.onrender.com`).

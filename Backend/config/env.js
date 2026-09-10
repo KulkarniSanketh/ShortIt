@@ -14,17 +14,18 @@ function required(name) {
 
 const nodeEnv = process.env.NODE_ENV || "development";
 const port = Number(process.env.PORT) || 8000;
+const configuredOrigins = (process.env.FRONTEND_ORIGIN || "https://shortit-url.netlify.app")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 const env = {
   nodeEnv,
   isProduction: nodeEnv === "production",
   port,
   mongoUrl: required("MONGO_URL"),
-  baseUrl: (process.env.BASE_URL || `http://localhost:${port}`).replace(/\/$/, ""),
-  frontendOrigins: (process.env.FRONTEND_ORIGIN || "http://localhost:5173")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean),
+  baseUrl: (process.env.BASE_URL || "https://shortit-lluo.onrender.com").replace(/\/$/, ""),
+  frontendOrigins: [...new Set([...configuredOrigins, "https://shortit-url.netlify.app"])],
 };
 
 module.exports = env;

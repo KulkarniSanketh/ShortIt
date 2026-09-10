@@ -7,7 +7,7 @@ function assert(condition, message) {
 }
 
 assert(extractShortId("launch-day") === "launch-day", "raw alias");
-assert(extractShortId("http://localhost:8000/launch-day") === "launch-day", "full url");
+assert(extractShortId("https://shortit-lluo.onrender.com/launch-day") === "launch-day", "full url");
 assert(extractShortId("  ") === "", "blank");
 assert(formatDate("not-a-date") === "Unknown date", "invalid date");
 
