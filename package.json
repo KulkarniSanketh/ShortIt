@@ -4,11 +4,11 @@
   "version": "1.0.0",
   "description": "ShortIt URL shortener — React frontend and Express API",
   "scripts": {
+    "build": "npm install --prefix frontend && npm run build --prefix frontend",
     "setup": "npm install --prefix Backend && npm install --prefix frontend",
     "dev": "concurrently -n api,web -c teal,magenta \"npm run dev --prefix Backend\" \"npm run start --prefix frontend\"",
     "dev:api": "npm run dev --prefix Backend",
     "dev:web": "npm run start --prefix frontend",
-    "build": "npm run build --prefix frontend",
     "start": "npm run start --prefix Backend",
     "test": "npm test --prefix Backend && npm test --prefix frontend",
     "lint": "npm run lint --prefix frontend"
