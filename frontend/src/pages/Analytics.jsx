@@ -69,7 +69,7 @@ export default function Analytics() {
               className="form-control"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="launch-day or https://shortit-lluo.onrender.com/launch-day"
+              placeholder="launch-day or http://localhost:8000/launch-day"
             />
             <button className="btn btn-accent" type="submit" disabled={loading}>
               {loading ? "Loading..." : "Look up"}

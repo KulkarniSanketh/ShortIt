@@ -1,4 +1,4 @@
-const API_URL = (import.meta.env.VITE_API_URL || "https://shortit-lluo.onrender.com").replace(/\/$/, "");
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "");
 
 async function request(path, options = {}) {
   const { headers, ...rest } = options;
