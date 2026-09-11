@@ -118,6 +118,46 @@ function isValidCustomAlias(alias) {
   return typeof alias === "string" && /^[a-zA-Z0-9_-]{3,32}$/.test(alias) && !isReservedAlias(alias);
 }
 
+function generateAliasCandidates(alias) {
+  const baseAlias = String(alias || "").trim();
+  if (!baseAlias) {
+    return [];
+  }
+
+  return [
+    `${baseAlias}-go`,
+    `${baseAlias}-link`,
+    `${baseAlias}-now`,
+    `${baseAlias}-web`,
+    `${baseAlias}-hub`,
+    `${baseAlias}-pro`,
+    `${baseAlias}-x`,
+    `my-${baseAlias}`,
+    `go-${baseAlias}`,
+    `use-${baseAlias}`,
+    `get-${baseAlias}`,
+    `try-${baseAlias}`,
+    `the-${baseAlias}`,
+    `${baseAlias}-hq`,
+    `${baseAlias}-io`,
+  ];
+}
+
+function pickAvailableAliasSuggestions(alias, takenAliases = [], offset = 0) {
+  const taken = new Set(
+    (Array.isArray(takenAliases) ? takenAliases : [...takenAliases])
+      .map((value) => String(value).trim())
+      .filter(Boolean)
+  );
+
+  const available = generateAliasCandidates(alias).filter((candidate) => {
+    const normalized = String(candidate).trim();
+    return normalized && !taken.has(normalized) && isValidCustomAlias(normalized);
+  });
+
+  return available.slice(offset, offset + 4);
+}
+
 module.exports = {
   MAX_URL_LENGTH,
   normalizeHttpUrl,
@@ -125,4 +165,6 @@ module.exports = {
   isValidCustomAlias,
   isReservedAlias,
   isPrivateOrLocalHost,
+  generateAliasCandidates,
+  pickAvailableAliasSuggestions,
 };
