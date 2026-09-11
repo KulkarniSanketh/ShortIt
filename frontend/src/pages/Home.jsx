@@ -1,36 +1,31 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchRecentUrls, shortenUrl } from "../services/api";
+import { fetchAliasSuggestions, shortenUrl } from "../services/api";
 
 export default function Home() {
   const [originalUrl, setOriginalUrl] = useState("");
   const [customAlias, setCustomAlias] = useState("");
   const [result, setResult] = useState(null);
-  const [recent, setRecent] = useState([]);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
+  const [aliasSuggestions, setAliasSuggestions] = useState([]);
   const copyTimer = useRef(null);
 
-  useEffect(() => {
-    let cancelled = false;
+  const refreshAliasSuggestions = async (alias, offset = 0) => {
+    const trimmedAlias = alias.trim();
+    if (!trimmedAlias) {
+      setAliasSuggestions([]);
+      return;
+    }
 
-    fetchRecentUrls()
-      .then((payload) => {
-        if (!cancelled) {
-          setRecent(payload.data || []);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setRecent([]);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [result]);
+    try {
+      const payload = await fetchAliasSuggestions(trimmedAlias, offset);
+      setAliasSuggestions(payload.data?.suggestions || []);
+    } catch {
+      setAliasSuggestions([]);
+    }
+  };
 
   useEffect(
     () => () => {
@@ -46,6 +41,7 @@ export default function Home() {
     setError("");
     setCopied(false);
     setResult(null);
+    setAliasSuggestions([]);
 
     try {
       setLoading(true);
@@ -58,6 +54,13 @@ export default function Home() {
       setCustomAlias("");
     } catch (err) {
       setError(err.message);
+      if (customAlias) {
+        const suggestions = err.payload?.suggestions || [];
+        setAliasSuggestions(suggestions);
+        if (!suggestions.length) {
+          await refreshAliasSuggestions(customAlias, 0);
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -132,6 +135,23 @@ export default function Home() {
                     {error}
                   </div>
                 )}
+                {aliasSuggestions.length > 0 && (
+                  <div className="mt-3">
+                    <p className="small text-muted mb-2">Available alternatives</p>
+                    <div className="d-flex flex-wrap gap-2">
+                      {aliasSuggestions.map((suggestedAlias) => (
+                        <button
+                          key={suggestedAlias}
+                          type="button"
+                          className="btn btn-outline-dark btn-sm"
+                          onClick={() => setCustomAlias(suggestedAlias)}
+                        >
+                          {suggestedAlias}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <button className="btn btn-accent w-100 mt-4" type="submit" disabled={loading}>
                   {loading ? "Shortening..." : "Create short link"}
                 </button>
@@ -162,45 +182,6 @@ export default function Home() {
               </form>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className="section-heading">
-            <h2>Recent public links</h2>
-            <p>The latest shortened URLs stored in this environment.</p>
-          </div>
-          {recent.length === 0 ? (
-            <p className="text-muted">No links yet. Create the first one above.</p>
-          ) : (
-            <div className="table-responsive card-surface p-0">
-              <table className="table table-hover mb-0 align-middle">
-                <thead>
-                  <tr>
-                    <th>Short link</th>
-                    <th>Destination</th>
-                    <th>Clicks</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recent.map((item) => (
-                    <tr key={item.id}>
-                      <td>
-                        <a href={item.shortUrl} target="_blank" rel="noopener noreferrer">
-                          {item.shortId}
-                        </a>
-                      </td>
-                      <td className="text-truncate" style={{ maxWidth: 360 }}>
-                        {item.redirectUrl}
-                      </td>
-                      <td>{item.visitCount}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
         </div>
       </section>
     </>

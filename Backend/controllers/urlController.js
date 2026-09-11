@@ -5,6 +5,8 @@ const {
   createShortId,
   isValidCustomAlias,
   isReservedAlias,
+  generateAliasCandidates,
+  pickAvailableAliasSuggestions,
 } = require("../utils/url");
 
 const MAX_STORED_VISITS = 50;
@@ -86,6 +88,24 @@ async function createShortUrl(req, res) {
     }
 
     preferredId = customAlias;
+
+    const conflict = await Url.findOne({ shortId: preferredId }).lean();
+    if (conflict) {
+      const candidates = generateAliasCandidates(preferredId);
+      const takenAliases = await Url.find({ shortId: { $in: candidates } }).distinct("shortId");
+      const available = candidates.filter((candidate) => {
+        const normalized = String(candidate).trim();
+        return normalized && !takenAliases.includes(normalized) && isValidCustomAlias(normalized);
+      });
+      const suggestions = available.slice(0, 4);
+
+      return res.status(409).json({
+        success: false,
+        error: `The alias "${preferredId}" is already taken. Try one of these instead:`,
+        suggestions,
+        totalAvailable: available.length,
+      });
+    }
   }
 
   const existingRecord = await Url.findOne({ redirectUrl });
@@ -126,16 +146,38 @@ async function getAnalytics(req, res) {
   });
 }
 
-async function listRecentUrls(req, res) {
-  const records = await Url.find()
-    .sort({ createdAt: -1 })
-    .limit(12)
-    .select("shortId redirectUrl visitCount createdAt updatedAt")
-    .lean();
+async function getAliasSuggestions(req, res) {
+  const alias = typeof req.query.alias === "string" ? req.query.alias.trim() : "";
+  const offset = Number.parseInt(req.query.offset || "0", 10);
+
+  if (!alias) {
+    return res.status(400).json({ success: false, error: "Alias is required" });
+  }
+
+  if (!isValidCustomAlias(alias)) {
+    return res.status(400).json({
+      success: false,
+      error: "Custom alias must be 3-32 characters and use letters, numbers, dashes, or underscores",
+    });
+  }
+
+  const candidates = generateAliasCandidates(alias);
+  const takenAliases = await Url.find({ shortId: { $in: candidates } }).distinct("shortId");
+  const available = candidates.filter((candidate) => {
+    const normalized = String(candidate).trim();
+    return normalized && !takenAliases.includes(normalized) && isValidCustomAlias(normalized);
+  });
+  const safeOffset = Number.isNaN(offset) ? 0 : Math.max(0, offset);
+  const suggestions = available.slice(safeOffset, safeOffset + 4);
 
   return res.json({
     success: true,
-    data: records.map(serializeUrl),
+    data: {
+      alias,
+      suggestions,
+      offset: safeOffset,
+      totalAvailable: available.length,
+    },
   });
 }
 
@@ -177,6 +219,6 @@ async function redirectToOriginal(req, res) {
 module.exports = {
   createShortUrl,
   getAnalytics,
-  listRecentUrls,
+  getAliasSuggestions,
   redirectToOriginal,
 };

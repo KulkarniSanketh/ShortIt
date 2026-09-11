@@ -20,7 +20,9 @@ async function request(path, options = {}) {
   const payload = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(payload.error || "Request failed");
+    const error = new Error(payload.error || "Request failed");
+    error.payload = payload;
+    throw error;
   }
 
   return payload;
@@ -33,12 +35,12 @@ export function shortenUrl({ url, customAlias }) {
   });
 }
 
-export function fetchAnalytics(shortId) {
-  return request(`/api/urls/${encodeURIComponent(shortId)}/analytics`);
+export function fetchAliasSuggestions(alias, offset = 0) {
+  return request(`/api/urls/suggestions?alias=${encodeURIComponent(alias)}&offset=${offset}`);
 }
 
-export function fetchRecentUrls() {
-  return request("/api/urls");
+export function fetchAnalytics(shortId) {
+  return request(`/api/urls/${encodeURIComponent(shortId)}/analytics`);
 }
 
 export function sendContact(body) {

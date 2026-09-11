@@ -104,10 +104,6 @@ export default function Analytics() {
               </div>
             </div>
             <div className="card-surface">
-              <h2 className="h5">Destination</h2>
-              <a href={data.redirectUrl} target="_blank" rel="noopener noreferrer">
-                {data.redirectUrl}
-              </a>
               <h2 className="h5 mt-4">Recent visits</h2>
               {visits.length === 0 ? (
                 <p className="text-muted mb-0">No clicks recorded yet.</p>

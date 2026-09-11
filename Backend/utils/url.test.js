@@ -5,6 +5,8 @@ const {
   isReservedAlias,
   normalizeHttpUrl,
   isPrivateOrLocalHost,
+  generateAliasCandidates,
+  pickAvailableAliasSuggestions,
 } = require("./url");
 
 test("accepts valid custom aliases", () => {
@@ -35,4 +37,21 @@ test("rejects local, private, and credentialed URLs", () => {
 test("detects private hosts", () => {
   assert.equal(isPrivateOrLocalHost("10.0.0.4"), true);
   assert.equal(isPrivateOrLocalHost("example.com"), false);
+});
+
+test("generates fallback alias candidates from a requested alias", () => {
+  const candidates = generateAliasCandidates("launch");
+  assert.ok(candidates.includes("launch-go"));
+  assert.ok(candidates.includes("my-launch"));
+  assert.equal(candidates.length, 15);
+});
+
+test("filters candidates to the available ones and keeps the first four", () => {
+  const suggestions = pickAvailableAliasSuggestions("launch", new Set([
+    "my-launch",
+    "launch-4",
+    "try-launch",
+    "go-launch",
+  ]));
+  assert.deepEqual(suggestions, ["launch-go", "launch-link", "launch-now", "launch-web"]);
 });
