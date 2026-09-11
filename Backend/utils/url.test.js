@@ -41,12 +41,17 @@ test("detects private hosts", () => {
 
 test("generates fallback alias candidates from a requested alias", () => {
   const candidates = generateAliasCandidates("launch");
-  assert.ok(candidates.includes("launch-1"));
+  assert.ok(candidates.includes("launch-go"));
   assert.ok(candidates.includes("my-launch"));
-  assert.equal(candidates.length, 20);
+  assert.equal(candidates.length, 15);
 });
 
 test("filters candidates to the available ones and keeps the first four", () => {
-  const suggestions = pickAvailableAliasSuggestions("launch", new Set(["launch-1", "my-launch", "launch-4", "try-launch", "go-launch"]));
-  assert.deepEqual(suggestions, ["launch-2", "launch-3", "launch-go", "launch-link"]);
+  const suggestions = pickAvailableAliasSuggestions("launch", new Set([
+    "my-launch",
+    "launch-4",
+    "try-launch",
+    "go-launch",
+  ]));
+  assert.deepEqual(suggestions, ["launch-go", "launch-link", "launch-now", "launch-web"]);
 });
